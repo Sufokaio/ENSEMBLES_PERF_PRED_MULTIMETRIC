@@ -19,8 +19,12 @@ os.makedirs(cfg.FIGURES_DIR, exist_ok=True)
 _FORCE      = False
 _SEL_SUFFIX = ""
 
+_RAW_CACHES = {"singles_raw", "ensembles_raw", "baseline",
+               "k_sk_ranks", "k_sk_ranks_perrule"}
+
 def _cache(name):
-    return os.path.join(cfg.CACHE_DIR, f"{name}{_SEL_SUFFIX}.parquet")
+    suffix = "" if name in _RAW_CACHES else _SEL_SUFFIX
+    return os.path.join(cfg.CACHE_DIR, f"{name}{suffix}.parquet"), suffix
 
 def _out_dir(base_dir):
     if _SEL_SUFFIX:
@@ -30,25 +34,23 @@ def _out_dir(base_dir):
     return base_dir
 
 def _save(df, name):
-    df.to_parquet(_cache(name), index=False)
-    print(f"  cached {name}{_SEL_SUFFIX} ({len(df):,} rows)")
-
-_RAW_CACHES = {"singles_raw", "ensembles_raw", "baseline",
-               "k_sk_ranks", "k_sk_ranks_perrule"}
+    path, suffix = _cache(name)
+    df.to_parquet(path, index=False)
+    print(f"  cached {name}{suffix} ({len(df):,} rows)")
 
 def _load(name):
-    suffix = "" if name in _RAW_CACHES else _SEL_SUFFIX
-    p = os.path.join(cfg.CACHE_DIR, f"{name}{suffix}.parquet")
-    if not os.path.exists(p):
+    path, _ = _cache(name)
+    if not os.path.exists(path):
         raise FileNotFoundError(
-            f"Cache file missing: {p}\n"
+            f"Cache file missing: {path}\n"
             "Run --load (and --aggregate if needed) first."
         )
-    return pd.read_parquet(p)
+    return pd.read_parquet(path)
 
 def _skip(name):
-    if not _FORCE and os.path.exists(_cache(name)):
-        print(f"  skip {name}{_SEL_SUFFIX} (already cached; use --force to recompute)")
+    path, suffix = _cache(name)
+    if not _FORCE and os.path.exists(path):
+        print(f"  skip {name}{suffix} (already cached; use --force to recompute)")
         return True
     return False
 
