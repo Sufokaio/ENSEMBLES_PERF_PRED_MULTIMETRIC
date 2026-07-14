@@ -1,0 +1,16 @@
+# Python cache
+__pycache__/
+**/__pycache__/
+
+# Virtual environment
+venv/
+.venv/
+
+# Results folder
+results/
+results_new/
+
+times.txt
+
+# NN predictions backup (pre-fix, kept locally only)
+results_nn_backup/
