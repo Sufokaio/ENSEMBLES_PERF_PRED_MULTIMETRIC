@@ -3,7 +3,9 @@ import ast
 import json
 import multiprocessing
 import os
+import sys
 import time
+import traceback
 
 import numpy as np
 from sklearn.base import clone
@@ -212,6 +214,14 @@ def run_val_task(model_name, dataset, s, out_root):
     return f"Completed {model_name} on {dataset} sample {s}"
 
 
+def run_task(task):
+    try:
+        return run_val_task(*task)
+    except Exception:
+        traceback.print_exc()
+        return f"FAILED {task[0]} on {task[1]} sample {task[2]}"
+
+
 def main():
     parser = argparse.ArgumentParser(description='Validation predictions of the top-10 variants')
     parser.add_argument('--dataset', type=str, default='all', help='Dataset name')
@@ -243,13 +253,15 @@ def main():
 
     t0 = time.time()
     if args.processes == 1 or len(task_args) == 1:
-        results = [run_val_task(*task) for task in task_args]
+        results = [run_task(task) for task in task_args]
     else:
         with multiprocessing.Pool(processes=min(args.processes, len(task_args))) as pool:
-            results = pool.starmap(run_val_task, task_args)
+            results = list(pool.imap_unordered(run_task, task_args, chunksize=1))
     for res in results:
         print(res)
-    print(f"All validation tasks completed in {time.time() - t0:.2f} seconds")
+    print(f"All validation tasks finished in {time.time() - t0:.2f} seconds")
+    if any(res.startswith("FAILED") for res in results):
+        sys.exit(1)
 
 
 if __name__ == "__main__":

@@ -131,6 +131,8 @@ def main():
 
     args = parser.parse_args()
 
+    if args.dataset is not None and args.size is None:
+        parser.error("--size is required with --dataset")
     scenarios = SMALLEST if args.dataset is None else [(args.dataset, args.size)]
     if args.model == "all":
         models = [m for m in MODEL_REGISTRY.keys() if m != "baseline"]

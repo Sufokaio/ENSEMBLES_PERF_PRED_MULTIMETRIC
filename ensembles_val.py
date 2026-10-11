@@ -2,7 +2,9 @@ import argparse
 import json
 import multiprocessing
 import os
+import sys
 import time
+import traceback
 import zlib
 
 import numpy as np
@@ -123,7 +125,7 @@ def combine_nn(y_train_preds, y_train, y_preds, y_val_preds, run_idx,
 def select_members(selector, k, run, borda_order, seed_key):
     if selector == "top":
         return borda_order[:k]
-    rng = np.random.default_rng([INIT_SEED + run, k, seed_key])
+    rng = np.random.RandomState([INIT_SEED + run, k, seed_key])
     drawn = set(rng.choice(len(borda_order), size=k, replace=False).tolist())
     return [i for i in borda_order if i in drawn]
 
@@ -207,12 +209,18 @@ def run_ensemble_task(model_name, dataset, s, val_dir, out_root):
         print(f"Skipping {model_name} on {dataset} sample {s}, all files exist", flush=True)
         return f"Skipped {model_name} on {dataset} sample {s}"
 
+    val_task_dir = os.path.join(val_dir, dataset, str(s), model_name)
+    if not all(os.path.exists(run_path(val_task_dir, run)) for run in range(NUM_RUNS)):
+        print(f"Skipping {model_name} on {dataset} sample {s}, validation predictions missing", flush=True)
+        return f"Skipped {model_name} on {dataset} sample {s} (validation predictions missing)"
+
     print(f"PID {os.getpid()} is running ensembles for {model_name} on {dataset} sample {s}", flush=True)
     t_task = time.time()
     data, val_runs = load_scenario(dataset, s, model_name, val_dir)
     ranking = val_borda(data, val_runs)
-    with open(ranking_path, "w") as f:
+    with open(ranking_path + ".tmp", "w") as f:
         json.dump(ranking, f, indent=2)
+    os.replace(ranking_path + ".tmp", ranking_path)
 
     seed_key = zlib.crc32(f"{model_name}|{dataset}|{s}".encode())
     for selector, k, combiner, file_name in pending:
@@ -228,6 +236,14 @@ def run_ensemble_task(model_name, dataset, s, val_dir, out_root):
 
     log_time(out_root, f"Completed ensembles {model_name} on {dataset} sample {s} in {time.time() - t_task:.2f} seconds")
     return f"Completed {model_name} on {dataset} sample {s}"
+
+
+def run_task(task):
+    try:
+        return run_ensemble_task(*task)
+    except Exception:
+        traceback.print_exc()
+        return f"FAILED {task[0]} on {task[1]} sample {task[2]}"
 
 
 def main():
@@ -262,13 +278,15 @@ def main():
 
     t0 = time.time()
     if args.processes == 1 or len(task_args) == 1:
-        results = [run_ensemble_task(*task) for task in task_args]
+        results = [run_task(task) for task in task_args]
     else:
         with multiprocessing.Pool(processes=min(args.processes, len(task_args))) as pool:
-            results = pool.starmap(run_ensemble_task, task_args)
+            results = list(pool.imap_unordered(run_task, task_args, chunksize=1))
     for res in results:
         print(res)
-    print(f"All ensemble tasks completed in {time.time() - t0:.2f} seconds")
+    print(f"All ensemble tasks finished in {time.time() - t0:.2f} seconds")
+    if any(res.startswith("FAILED") for res in results):
+        sys.exit(1)
 
 
 if __name__ == "__main__":
