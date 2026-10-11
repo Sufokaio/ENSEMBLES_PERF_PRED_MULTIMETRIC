@@ -1,0 +1,276 @@
+REVISION PLAN - CODE / EXPERIMENT PART (JSSOFTWARE-D-26-01916)
+=================================================================
+Scope: every reviewer comment that touches code or needs a (re)run,
+verified against the repository and the saved results in results_new/.
+Text-only comments are not covered here.
+
+Legend:  [REAL] real problem   [PARTLY] partly real / small
+         [OK] not a problem (text only)   [NEW] new step   [KEEP] keep as is
+         [RERUN] rerun
+
+
+-----------------------------------------------------------------
+0. REVISED PIPELINE AND WHAT GETS RERUN
+-----------------------------------------------------------------
+
+grid search -> top-10 variants -> validation preds (NEW) -> validation Borda
+            -> selector -> combiner -> test evaluation
+
+  selector (after the top-10, design choice):   combiner:
+    - Borda top-k (validation)                    - MEAN
+    - random-k                                    - IRWM
+    - bottom-k                                    - NN (trained on out-of-fold preds)
+    - diversity-aware (greedy)
+
+Step-by-step status:
+  [KEEP]  Grid search -> top-10 variants per model. NO new grid search.
+  [KEEP]  Single variants: test predictions + metrics (saved). Only recompute
+          metrics from saved predictions if clipping is added. No retraining.
+  [NEW]   Single variants: VALIDATION predictions. The only new training.
+          - Traditional (LR, SVR, RT, RF, KNN, KRR): 5-fold out-of-fold on each
+            run's training set (fit on 4/5, predict 1/5), same hyperparameters.
+          - DeepPerf / HINNPerf: train each variant on 2/3 of the run's
+            training set, predict the remaining 1/3 (their own split).
+  [RERUN] Borda ranking on validation metrics (multi-metric, as before).
+  [RERUN] Selector (top-k, random-k, bottom-k, diversity-aware).
+  [RERUN] Combiner + ensemble test evaluation (NN on out-of-fold preds).
+  [RERUN] Analysis; all results re-reported.
+
+Why validation predictions and not the saved CV score: grid search kept only
+one number, the mean CV MAE ("Rank"). Without predictions we cannot compute
+validation MRE/MBRE/MIBRE for Borda, score ensembles on validation, train the
+NN on held-out predictions, or measure diversity for the selector.
+
+
+-----------------------------------------------------------------
+1. REVIEWER CONCERNS THAT TOUCH CODE - VERDICT AND ACTION
+-----------------------------------------------------------------
+
+R3-C5, R3-G5  Borda ranking on test?                              [REAL]
+  - main.py:71 eval_top10 ranks the 10 singles by TEST metrics (mean over
+    30 runs). That order sets the top-k members and the IRWM weights.
+  - Impact is material: CV rank vs test Borda rank often disagree (negative
+    Spearman rho in many scenarios). Example: apache-18 RT top-5 MEAN =
+    10.0 MRE with test order vs 17.5 with CV order.
+  - Fix: validation Borda (section 0). In the response: say it honestly,
+    show an old-vs-new table. Do not promise "conclusions unchanged".
+
+R2-C20  How is validation separated from training?                [OK]
+  - Traditional: GridSearchCV 5-fold inside the training set.
+  - DeepPerf/HINNPerf: 2/3-1/3 split inside the training set.
+  - Test set never used for hyperparameters. Describe the full pipeline;
+    redraw Figure 2 (R2-C19) with the train / validation / test flow.
+
+R2-C21  NN combiner details                         [OK] no leak, [PARTLY] weakness
+  - Weights fit on training data only (main.py:182), but on the members'
+    IN-SAMPLE training predictions.
+  - Report: one linear layer (= linear stacking), MAE loss, Adam,
+    <=600 epochs, early stopping patience 20 on TRAINING loss,
+    z-scored inputs and target.
+  - Fix: train on out-of-fold predictions (Wolpert 1992; Breiman 1996).
+
+R2-C31  Why is NN worse for strong learners?                       [PARTLY]
+  - Explained by the above: RT/RF/KNN in-sample predictions are near-perfect,
+    so the combiner learns weights that do not transfer to test.
+  - At S1 it fits k+1 parameters on 9-31 points (k=10 -> 11 params, 9 points
+    at apache).
+  - Check whether the pattern still holds after the out-of-fold fix.
+
+R3-C1  One random draw per scenario or many?                       [OK]
+  - 30 independent permutations (seeds 25-54), identical for all learners
+    -> paired comparisons. State it explicitly.
+
+R1-C2  "Random" training sample sizes                              [OK]
+  - Sizes are fixed per system (DATASET_REGISTRY in main.py); only which
+    configurations go into the training set is random. Rewrite the
+    sentence on page 7 and cite the source of the sizes.
+
+R3-C3, R3-G3, R2-C32, R2-C9  Diversity                   [REAL] gap, good story
+  - Never enforced or measured.
+  - Error correlation within the top-10 (apache, x264):
+      SVR / RF / KRR : 0.98-1.00 (no diversity)
+      LR             : ~1.00 (0.75-0.91 at small sizes)
+      KNN            : 0.84-0.92
+      RT             : 0.56-0.84
+      DeepPerf       : 0.53-0.83 (top-10 = mostly one architecture, different lambda)
+      HINNPerf       : 0.71-0.86
+    Gains appear where errors differ.
+  - Use ERROR correlation as the main measure (prediction correlation is
+    ~1 for any good model and is misleading).
+  - Plan: error correlation, prediction correlation, ambiguity
+    (Krogh & Vedelsby) per ensemble; scatter diversity vs gain + Spearman.
+  - Can be done NOW from saved predictions.
+
+R3-C6(b,c), R3-C7, R3-G2  Random-k, bottom-k, ablation             [REAL] gap
+  - Selectors inside the top-10 pool; compare at k = 2..9
+    (at k = 10 all selectors give the same ensemble).
+  - random-k: fresh random subset per run (30 runs = 30 draws).
+    Ranking-free -> can be done NOW from saved predictions.
+  - bottom-k: weakest k by validation Borda = "weaker but still tuned"
+    members; state that in the paper. Needs the validation ranking.
+  - Ablation table: best single -> random-k -> bottom-k -> top-k ->
+    diversity-aware, each x MEAN / IRWM / NN. Isolates selection vs
+    ensembling vs combination rule.
+
+R3-C6(d)  Diversity-aware selection                                [REAL] gap
+  - Selector applied after the top-10 (design choice, before the combiner).
+  - Greedy forward selection minimising validation error and/or error
+    correlation (Caruana et al. 2004).
+  - Must use VALIDATION predictions (in-sample predictions are useless for
+    RT/RF/KNN, which fit their training data almost perfectly).
+
+R3-C6(a)  Justification of Borda                                   [OK] text
+  - Merges the four metrics without favouring MRE; cite prior use.
+
+R3-C2, R3-G4  Stability at S1 (9 samples)                          [PARTLY]
+  - Apache S1: 5-fold CV = ~2 validation points per fold;
+    DeepPerf/HINNPerf = 6 train / 3 validation.
+  - Per-run hyperparameter stability CANNOT be measured from saved data
+    (top-10 list is pooled across the 30 runs).
+  - Plan: report the spread across the 30 runs at S1 + threats to validity.
+    Optional: rerun traditional grid search at S1 only, saving per-run rankings.
+
+R3-C4  Why only 10 members?                                        [OK] text
+  - Saturation at k = 4-5; cost grows linearly with k.
+  - Optional: variants 11-20 for one or two traditional learners.
+
+R1-C4  Medians                                                     [OK] recompute
+  - Per-run metrics and per-configuration predictions are saved.
+    MdMRE / MdAE / MdBRE / MdIBRE recomputable, no rerun.
+
+R2-C22  Negative predictions                                       [PARTLY] small
+  - No clipping anywhere. LR at apache-9: 3.1% negative predictions;
+    other learners ~0%.
+  - Negative predictions break MBRE (min(y, y_hat) < 0, base.py:68) and make
+    LSD NaN.
+  - Singles use no epsilon in metrics; ensembles add 1e-8 (main.py:304).
+  - Plan: clip at a small positive floor; one shared metric function for
+    singles and ensembles; recompute from saved predictions.
+
+R2-C29  Timing                                                     [REAL] no data
+  - log_time writes times.txt, which does not exist.
+  - Measure training / inference for single vs k = 2..10 on a few scenarios.
+
+R2-C25  Why traditional learners win on some datasets              [OK] compute
+  - From the CSVs only: share of numeric options, samples vs options,
+    skewness, linear-model R^2, interaction strength.
+
+R2-C18  Random guessing baseline                                   [OK] text
+  - Leave-one-out draws from the TEST values, 200 trials (baseline.py).
+    Standard SA protocol (Shepperd & MacDonell).
+
+R2-C17  A12 threshold 0.60                                         [OK] text
+  - Hard-coded in the SK call; cite the implementation and Vargha & Delaney.
+
+R2-C33  Randomness of hyperparameter search                        [OK] text
+  - GridSearchCV = unshuffled KFold -> deterministic for a given split.
+    Randomness = the split + network initialisation (DeepPerf, HINNPerf,
+    NN combiner). Mitigated by the 30 runs.
+
+R3-C8, R3-G1  Cross-system validation                              [OK] rebuttal
+  - Each system has a different feature space; within-system is the
+    standard protocol. Threats + future work.
+
+
+-----------------------------------------------------------------
+2. EXTRA ISSUE (not raised by reviewers)
+-----------------------------------------------------------------
+
+Best single / best ensemble chosen on test.
+  - analysis_new/aggregators/best_variant.py reports the lowest TEST MRE out
+    of 10 singles (RQ1, RQ2), 27 ensembles (RQ2) and 9 k values (RQ3.3).
+  - Separate code path from main.py: fixing Borda does NOT change it.
+  - Best of 27 vs best of 10 on test inflates the ensemble win rate. Example:
+    RF members make identical errors (error corr 1.00) yet RF shows 100% wins
+    now, ~50% wins / ~0% gain with a leak-free choice.
+  - Fix: best single = validation Borda #1; best ensemble = (k, rule) with the
+    best validation score; report TEST scores as now. No extra compute.
+  - Minimum: add it as a robustness row.
+  - Risk: Reviewer 3 likely raises it in round 2 once R1-C7 / R2-C20 make us
+    describe the pipeline.
+
+
+-----------------------------------------------------------------
+3. COMPUTE BUDGET (40 scenarios)
+-----------------------------------------------------------------
+
+Traditional validation predictions
+  10 variants x 5 folds x 30 runs x 6 learners ~= 360k small sklearn fits.
+  = 50 fits per run, vs original grid search per run:
+    LR 70, SVR 160, KNN ~180, RT 375, KRR 1,920, RF 2,500 fits.
+  -> Hours.
+
+DL validation predictions
+  10 variants x 30 runs -> 12k DeepPerf + 12k HINNPerf trainings on 2/3 data.
+  ~= the original final-evaluation stage.
+  ~5% of the original HINNPerf cost (216 configs tuned per run),
+  ~10-20% of DeepPerf.
+  -> The long pole: hipacc, lrzip, dune.
+
+Single test predictions
+  0 (saved).
+
+Ensembles, MEAN + IRWM
+  ~173k averages per selector -> minutes.
+
+Ensembles, NN
+  ~86k small Keras fits per selector = same as the original NN stage.
+  Run NN fully for top-k; for random-k / bottom-k / diversity-aware consider
+  MEAN + IRWM only, or NN on a subset.
+
+Analysis
+  run_all.py -> minutes to hours.
+
+Storage
+  Current results: 19 GB singles + 42 GB ensembles.
+  Write the rerun to a NEW folder and slim the ensemble files (no duplicated
+  y_test; metrics + y_pred only, or compressed .npz). Otherwise budget
+  ~42 GB per selector. Validation predictions are small.
+
+Zero-cost fallback (NOT recommended)
+  Order members by the existing "Rank" (validation MAE). No training, but:
+  MAE-only, no validation choice of k/rule, NN stays in-sample, no diversity
+  selector. Weak against Reviewer 3.
+
+
+-----------------------------------------------------------------
+4. ORDER OF WORK
+-----------------------------------------------------------------
+
+1. NOW (no dependencies):
+   - diversity analysis (saved predictions)
+   - random-k ablation (saved predictions)
+   - medians
+   - dataset characteristics (R2-C25)
+   - clipping + one shared metric function
+   - S1 spread across runs
+   - timing on a few scenarios
+   - all text-only comments
+   - ask the editor for an extension
+
+2. Validation predictions for the 10 variants
+   (traditional first, DeepPerf/HINNPerf in parallel).
+
+3. Validation Borda -> selectors -> combiners (NN out-of-fold)
+   -> test evaluation -> validation-based best-variant choice.
+
+4. Analysis rerun, ablation table, old-vs-new table for R3-C5,
+   Figure 2 redraw, tables and figures.
+
+5. Rewrite RQ2 / RQ3 claims, abstract and highlights last.
+
+
+-----------------------------------------------------------------
+5. EXPECTED OUTCOME (probe on apache, x264, bdbc, hsmgp)
+-----------------------------------------------------------------
+
+Leak-free comparison (CV-rank-1 single vs MEAN of CV-top-5):
+  - HINNPerf: still 100% wins, +8-11%  -> claim survives
+  - DeepPerf, RT, KNN: mixed to positive
+  - SVR, RF, KRR, LR: ~0% or negative under MEAN (LR may recover through NN)
+
+Likely framing: homogeneous ensembles help when member errors differ.
+This also answers Reviewer 3's main concern (diversity).
+
+Probe scripts (probe.py, probe2.py, probe3.py) are in the Claude session
+scratchpad if the other agent wants to extend them to all 8 systems.

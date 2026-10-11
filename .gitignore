@@ -14,3 +14,7 @@ times.txt
 
 # NN predictions backup (pre-fix, kept locally only)
 results_nn_backup/
+
+# Validation predictions
+results_val/
+results_val_check/
