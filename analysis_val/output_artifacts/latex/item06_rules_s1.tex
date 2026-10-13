@@ -1,0 +1,16 @@
+\begin{tabular}{lrrrrrrrrrrrr}
+\toprule
+Model & \multicolumn{3}{c}{Mean SK rank (MRE)} & \multicolumn{3}{c}{MEAN vs IRWM} & \multicolumn{3}{c}{MEAN vs NN} & \multicolumn{3}{c}{IRWM vs NN} \\
+ & MEAN & IRWM & NN & W & T & L & W & T & L & W & T & L \\
+\midrule
+LR & 1.75 & 1.38 & 1.53 & 0 & 45 & 27 & 27 & 12 & 33 & 29 & 16 & 27 \\
+SVR & 1.17 & 1.15 & 1.43 & 0 & 71 & 1 & 31 & 30 & 11 & 31 & 30 & 11 \\
+RT & 1.11 & 1.00 & 1.04 & 0 & 64 & 8 & 3 & 61 & 8 & 3 & 69 & 0 \\
+RF & 1.08 & 1.08 & 1.00 & 0 & 72 & 0 & 0 & 66 & 6 & 0 & 66 & 6 \\
+KNN & 1.00 & 1.00 & 1.15 & 0 & 72 & 0 & 11 & 61 & 0 & 11 & 61 & 0 \\
+KRR & 1.01 & 1.01 & 1.06 & 0 & 72 & 0 & 4 & 67 & 1 & 4 & 67 & 1 \\
+DeepPerf & 1.03 & 1.00 & 1.61 & 0 & 70 & 2 & 42 & 30 & 0 & 43 & 29 & 0 \\
+HINNPerf & 1.00 & 1.00 & 1.60 & 0 & 72 & 0 & 43 & 29 & 0 & 43 & 29 & 0 \\
+ALL & 1.14 & 1.08 & 1.30 & 0 & 538 & 38 & 161 & 356 & 59 & 164 & 367 & 45 \\
+\bottomrule
+\end{tabular}

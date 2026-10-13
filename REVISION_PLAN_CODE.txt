@@ -271,6 +271,3 @@ Leak-free comparison (CV-rank-1 single vs MEAN of CV-top-5):
 
 Likely framing: homogeneous ensembles help when member errors differ.
 This also answers Reviewer 3's main concern (diversity).
-
-Probe scripts (probe.py, probe2.py, probe3.py) are in the Claude session
-scratchpad if the other agent wants to extend them to all 8 systems.

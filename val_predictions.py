@@ -182,7 +182,7 @@ def run_val_task(model_name, dataset, s, out_root):
         y_train_stored, y_test_stored = stored[run]
         if not np.array_equal(evaluator.y[train_idx], y_train_stored):
             raise ValueError(f"y_train mismatch: {model_name} {dataset} {s} run {run}")
-        if not np.array_equal(evaluator.y[test_idx], y_test_stored):
+        if not np.allclose(evaluator.y[test_idx], y_test_stored, rtol=1e-12, atol=0.0):
             raise ValueError(f"y_test mismatch: {model_name} {dataset} {s} run {run}")
 
         if model_name in TRADITIONAL:

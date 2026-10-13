@@ -19,3 +19,8 @@ results_nn_backup/
 results_val/
 results_val_check/
 results_ens_val/
+results_ens_val_pilot/
+results_val_pilot/
+results_val_check_pilot/
+ens_log.txt
+val_log.txt

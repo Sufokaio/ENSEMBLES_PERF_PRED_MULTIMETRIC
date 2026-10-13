@@ -1,0 +1,32 @@
+Dataset characteristics (Reviewer 2, Comment #25)
+
+Definitions
+- Options: feature columns of data/<system>.csv with more than one distinct value. Columns with a
+  single value (2 each in DUNE, HIPACC, HSMGP, KANZI) are excluded from all counts and from p.
+- Binary option: 2 distinct values. Numeric option: more than 2 distinct values.
+  Several binary columns are one-hot encodings of one categorical option (e.g. Smoother_* in HSMGP,
+  blocksize_* in KANZI, compression* in LRZIP, ref_* in X264, PS*K in BDBC).
+- S_i/p: training size divided by the number of options p.
+- Skewness: third standardized moment of the performance value. CV: standard deviation / mean.
+- eta squared of an option: between-group sum of squares of the performance value over the groups
+  defined by the values of that option, divided by the total sum of squares. Computed on all
+  configurations, one option at a time; no model is fitted. Because options are correlated
+  (one-hot groups, constraints), the values of different options do not add up to a decomposition
+  and their sum can exceed 1 (X264: ref_1 and ref_9 are 0.64 each).
+
+Observations
+1. Sampling density at S1 splits the systems in two groups: APACHE, BDBC, KANZI and X264 have about
+   1.1 to 1.2 training configurations per option (KANZI lowest, 1.07), while HSMGP (6.4), HIPACC (8.4),
+   LRZIP (10.6) and DUNE (24.9) have between 6 and 25.
+2. HSMGP has the most concentrated effect: one option (Smoother_GSACBE) alone explains 0.76 of the
+   variance, no other option exceeds 0.05, and the top 3 reach 0.85.
+3. LRZIP has the most dispersed performance values (CV 2.18, skewness 3.60). One binary option
+   (compressionZpaq) explains 0.50; the next is a numeric option with 9 levels (level, 0.09).
+4. KANZI has the second highest CV (1.98) and the variance is spread over more options than in any
+   other system: 4 options exceed 0.05 and the largest explains 0.33. It has only binary options and
+   the lowest S1/p.
+5. HSMGP, LRZIP and KANZI are three of the four systems with CV above 1 (1.33, 2.18, 1.98); the fourth
+   is BDBC (1.42). The remaining systems have CV between 0.34 and 0.44. Skewness does not separate
+   them: DUNE has the highest skewness (4.73) with a CV of 0.34.
+6. Numeric options exist only in DUNE, HIPACC, HSMGP and LRZIP, with at most 3 per system and a share
+   of at most one third of the options.
