@@ -1,0 +1,129 @@
+panel,scope,model,dataset,mean_sk_rank
+a,all sizes,LR,apache,4.0
+a,all sizes,LR,bdbc,5.2
+a,all sizes,LR,dune,6.6
+a,all sizes,LR,hipacc,5.6
+a,all sizes,LR,hsmgp,6.8
+a,all sizes,LR,kanzi,5.6
+a,all sizes,LR,lrzip,7.4
+a,all sizes,LR,x264,4.8
+a,all sizes,SVR,apache,5.2
+a,all sizes,SVR,bdbc,3.6
+a,all sizes,SVR,dune,5.8
+a,all sizes,SVR,hipacc,3.6
+a,all sizes,SVR,hsmgp,3.6
+a,all sizes,SVR,kanzi,2.8
+a,all sizes,SVR,lrzip,6.0
+a,all sizes,SVR,x264,6.0
+a,all sizes,RT,apache,3.2
+a,all sizes,RT,bdbc,1.6
+a,all sizes,RT,dune,3.0
+a,all sizes,RT,hipacc,3.2
+a,all sizes,RT,hsmgp,4.8
+a,all sizes,RT,kanzi,2.0
+a,all sizes,RT,lrzip,1.0
+a,all sizes,RT,x264,3.6
+a,all sizes,RF,apache,2.4
+a,all sizes,RF,bdbc,2.6
+a,all sizes,RF,dune,2.4
+a,all sizes,RF,hipacc,3.2
+a,all sizes,RF,hsmgp,3.8
+a,all sizes,RF,kanzi,3.0
+a,all sizes,RF,lrzip,2.0
+a,all sizes,RF,x264,3.8
+a,all sizes,KNN,apache,4.4
+a,all sizes,KNN,bdbc,5.0
+a,all sizes,KNN,dune,4.6
+a,all sizes,KNN,hipacc,5.0
+a,all sizes,KNN,hsmgp,5.8
+a,all sizes,KNN,kanzi,4.2
+a,all sizes,KNN,lrzip,4.8
+a,all sizes,KNN,x264,6.2
+a,all sizes,KRR,apache,2.8
+a,all sizes,KRR,bdbc,3.8
+a,all sizes,KRR,dune,4.2
+a,all sizes,KRR,hipacc,3.6
+a,all sizes,KRR,hsmgp,1.0
+a,all sizes,KRR,kanzi,4.4
+a,all sizes,KRR,lrzip,6.2
+a,all sizes,KRR,x264,2.8
+a,all sizes,DeepPerf,apache,1.4
+a,all sizes,DeepPerf,bdbc,1.0
+a,all sizes,DeepPerf,dune,1.8
+a,all sizes,DeepPerf,hipacc,2.0
+a,all sizes,DeepPerf,hsmgp,2.6
+a,all sizes,DeepPerf,kanzi,1.8
+a,all sizes,DeepPerf,lrzip,3.8
+a,all sizes,DeepPerf,x264,2.0
+a,all sizes,HINNPerf,apache,1.0
+a,all sizes,HINNPerf,bdbc,1.2
+a,all sizes,HINNPerf,dune,1.0
+a,all sizes,HINNPerf,hipacc,1.0
+a,all sizes,HINNPerf,hsmgp,1.8
+a,all sizes,HINNPerf,kanzi,1.0
+a,all sizes,HINNPerf,lrzip,3.0
+a,all sizes,HINNPerf,x264,1.0
+b,S1,LR,apache,3.0
+b,S1,LR,bdbc,3.0
+b,S1,LR,dune,6.0
+b,S1,LR,hipacc,5.0
+b,S1,LR,hsmgp,6.0
+b,S1,LR,kanzi,4.0
+b,S1,LR,lrzip,7.0
+b,S1,LR,x264,2.0
+b,S1,SVR,apache,4.0
+b,S1,SVR,bdbc,2.0
+b,S1,SVR,dune,6.0
+b,S1,SVR,hipacc,3.0
+b,S1,SVR,hsmgp,3.0
+b,S1,SVR,kanzi,1.0
+b,S1,SVR,lrzip,5.0
+b,S1,SVR,x264,5.0
+b,S1,RT,apache,4.0
+b,S1,RT,bdbc,1.0
+b,S1,RT,dune,3.0
+b,S1,RT,hipacc,4.0
+b,S1,RT,hsmgp,4.0
+b,S1,RT,kanzi,2.0
+b,S1,RT,lrzip,1.0
+b,S1,RT,x264,2.0
+b,S1,RF,apache,3.0
+b,S1,RF,bdbc,2.0
+b,S1,RF,dune,2.0
+b,S1,RF,hipacc,3.0
+b,S1,RF,hsmgp,3.0
+b,S1,RF,kanzi,3.0
+b,S1,RF,lrzip,2.0
+b,S1,RF,x264,3.0
+b,S1,KNN,apache,4.0
+b,S1,KNN,bdbc,3.0
+b,S1,KNN,dune,4.0
+b,S1,KNN,hipacc,6.0
+b,S1,KNN,hsmgp,5.0
+b,S1,KNN,kanzi,3.0
+b,S1,KNN,lrzip,4.0
+b,S1,KNN,x264,4.0
+b,S1,KRR,apache,2.0
+b,S1,KRR,bdbc,2.0
+b,S1,KRR,dune,5.0
+b,S1,KRR,hipacc,3.0
+b,S1,KRR,hsmgp,1.0
+b,S1,KRR,kanzi,2.0
+b,S1,KRR,lrzip,6.0
+b,S1,KRR,x264,2.0
+b,S1,DeepPerf,apache,2.0
+b,S1,DeepPerf,bdbc,1.0
+b,S1,DeepPerf,dune,1.0
+b,S1,DeepPerf,hipacc,2.0
+b,S1,DeepPerf,hsmgp,2.0
+b,S1,DeepPerf,kanzi,2.0
+b,S1,DeepPerf,lrzip,3.0
+b,S1,DeepPerf,x264,2.0
+b,S1,HINNPerf,apache,1.0
+b,S1,HINNPerf,bdbc,1.0
+b,S1,HINNPerf,dune,1.0
+b,S1,HINNPerf,hipacc,1.0
+b,S1,HINNPerf,hsmgp,1.0
+b,S1,HINNPerf,kanzi,1.0
+b,S1,HINNPerf,lrzip,3.0
+b,S1,HINNPerf,x264,1.0

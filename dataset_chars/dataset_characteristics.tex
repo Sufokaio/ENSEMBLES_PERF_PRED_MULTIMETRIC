@@ -1,0 +1,20 @@
+\begin{table*}[t]
+\centering
+\caption{Characteristics of the subject systems. $p$: number of non-constant options; $S_i/p$: training size divided by $p$; CV: coefficient of variation of the performance value; $\eta^2$: share of the variance of the performance value explained by a single option.}
+\label{tab:dataset_chars}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrlrrrrrrrrrr}
+\toprule
+System & \#Conf. & \#Bin. & \#Num. & \%Num. & Distinct values (numeric) & $S_1/p$ & $S_2/p$ & $S_3/p$ & $S_4/p$ & $S_5/p$ & Skew. & CV & max $\eta^2$ & top-3 $\sum\eta^2$ & \#$\eta^2{>}0.05$ \\
+\midrule
+APACHE & 192 & 8 & 0 & 0.0 & -- & 1.1 & 2.2 & 3.4 & 4.5 & 5.6 & 0.73 & 0.33 & 0.51 (KeepAlive) & 0.84 & 3 \\
+BDBC & 2{,}560 & 16 & 0 & 0.0 & -- & 1.1 & 2.2 & 3.4 & 4.5 & 5.6 & 1.66 & 1.42 & 0.40 (HAVE\_CRYPTO) & 0.73 & 3 \\
+DUNE & 2{,}304 & 6 & 3 & 33.3 & 6, 7, 7 & 24.9 & 76.9 & 111.1 & 151.7 & 179.1 & 4.73 & 0.34 & 0.30 (post) & 0.43 & 2 \\
+HIPACC & 13{,}485 & 29 & 2 & 6.5 & 4, 17 & 8.4 & 17.0 & 23.7 & 41.3 & 84.9 & 1.65 & 0.44 & 0.40 (LocalMemory) & 0.54 & 3 \\
+HSMGP & 3{,}456 & 9 & 3 & 25.0 & 4, 7, 7 & 6.4 & 14.4 & 32.0 & 40.0 & 72.0 & 2.49 & 1.33 & 0.76 (Smoother\_GSACBE) & 0.85 & 1 \\
+KANZI & 3{,}202 & 29 & 0 & 0.0 & -- & 1.1 & 2.1 & 3.2 & 4.3 & 5.3 & 2.69 & 1.98 & 0.33 (blocksize\_1KB) & 0.78 & 4 \\
+LRZIP & 5{,}184 & 9 & 3 & 25.0 & 9, 4, 3 & 10.6 & 24.6 & 32.2 & 40.4 & 75.6 & 3.60 & 2.18 & 0.50 (compressionZpaq) & 0.62 & 2 \\
+X264 & 1{,}152 & 13 & 0 & 0.0 & -- & 1.2 & 2.5 & 3.7 & 4.9 & 6.2 & 0.33 & 0.35 & 0.64 (ref\_9) & 1.33 & 2 \\
+\bottomrule
+\end{tabular}}
+\end{table*}

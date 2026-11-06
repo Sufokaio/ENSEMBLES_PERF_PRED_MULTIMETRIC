@@ -1,0 +1,16 @@
+\begin{tabular}{lrrrrrrrrrrr}
+\toprule
+Model & \multicolumn{2}{c}{MRE} & \multicolumn{2}{c}{MAE} & \multicolumn{2}{c}{MBRE} & \multicolumn{2}{c}{MIBRE} & SA ($\Delta$) & Borda (8) & Borda (16) \\
+ & Median (IQR) & SK & Median (IQR) & SK & Median (IQR) & SK & Median (IQR) & SK & Median (IQR) &  &  \\
+\midrule
+LR & 19.98 (188.24) & 5.83 & 186.08 (647.96) & 5.67 & 0.19 (1.04) & 4.70 & 0.16 (0.93) & 6.12 & 0.550 (-27.38) & 8 & 15 \\
+SVR & 16.83 (64.24) & 4.58 & 215.39 (608.18) & 5.53 & 0.21 (2.14) & 4.53 & 0.15 (0.40) & 4.97 & 0.576 (-22.60) & 6 & 11 \\
+RT & 9.20 (10.80) & 2.95 & 109.99 (378.48) & 3.05 & 0.10 (0.12) & 2.92 & 0.08 (0.08) & 3.05 & 0.831 (-41.91) & 4 & 8 \\
+RF & 9.02 (14.56) & 2.95 & 98.18 (383.73) & 3.02 & 0.10 (0.16) & 2.65 & 0.08 (0.09) & 3.05 & 0.821 (-40.97) & 3 & 5 \\
+KNN & 18.74 (71.40) & 5.10 & 178.37 (548.22) & 5.20 & 0.21 (1.14) & 4.80 & 0.14 (0.16) & 4.80 & 0.615 (-30.60) & 7 & 12 \\
+KRR & 10.77 (99.19) & 3.67 & 70.30 (483.81) & 3.12 & 0.12 (0.75) & 3.02 & 0.10 (0.54) & 4.08 & 0.759 (-38.17) & 5 & 9 \\
+DeepPerf & 6.08 (13.99) & 2.00 & 42.67 (308.26) & 1.77 & 0.06 (0.16) & 1.75 & 0.06 (0.11) & 2.05 & 0.908 (-45.53) & 2 & 3 \\
+HINNPerf & \textbf{5.60 (9.92)} & 1.35 & \textbf{37.84 (319.73)} & 1.35 & \textbf{0.06 (0.11)} & 1.23 & \textbf{0.05 (0.07)} & 1.40 & \textbf{0.914 (-45.33)} & \textbf{1} & \textbf{1} \\
+\bottomrule
+\multicolumn{12}{l}{Value: median (interquartile range) across the 40 scenario means; SK: mean Scott-Knott rank; SA ($\Delta$): median across the 40 scenarios.} \\
+\end{tabular}
