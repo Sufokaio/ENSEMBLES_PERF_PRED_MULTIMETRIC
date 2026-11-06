@@ -150,10 +150,10 @@ The code under `/analysis_new` only reads existing result JSON files (from
        cd analysis_new
        python run_all.py --all --sel-agg mean
 
-   `--sel-agg mean` is the aggregation used for the tables/figures in the
-   paper; it writes to `output_artifacts/latex_mean/` and
+   `--sel-agg mean` writes to `output_artifacts/latex_mean/` and
    `output_artifacts/figures_mean/` (the default `--sel-agg median` writes
-   to `latex/`/`figures/`).
+   to `latex/`/`figures/`). The tables and figures of the paper are produced
+   by `/analysis_val` (see "Validation-Based Ranking and Selection").
 
    Or run individual stages (each caches its output, so later stages reuse
    it): `--load`, `--aggregate`, `--tables`, `--figures`. Add `--force` to
